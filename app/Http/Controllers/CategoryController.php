@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -11,7 +12,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::withCount('tasks')->latest()->get();
+        return view('category.index', compact('categories'));
     }
 
     /**
@@ -19,7 +21,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return view ('category.create');
     }
 
     /**
@@ -27,7 +29,15 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'  => 'required|string|max:255|unique:categories',
+            'color' => 'required|regex:/^#[0-9A-Fa-f]{6}$/'
+        ]);
+
+        Category::create($request->only('name', 'color'));
+
+        return redirect()->route('categories.index')
+                         ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
