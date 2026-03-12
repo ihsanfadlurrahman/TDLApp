@@ -21,6 +21,7 @@ Route::get('/', function () {
 
 // Task routes
 Route::resource('tasks', TaskController::class);
+Route::patch('tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
 
 // Category routes
 Route::resource('categories', CategoryController::class);
