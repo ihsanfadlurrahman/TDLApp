@@ -9,11 +9,18 @@
         @csrf @method('PUT')
         @include('tasks._form')
 
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-            <input type="checkbox" name="is_completed" value="1"
-                   {{ $task->is_completed ? 'checked' : '' }}>
-            Tandai sebagai selesai
-        </label>
+        {{-- Checkbox selesai, hanya tampil kalau tidak punya sub-task --}}
+        @if($task->subTasks->count() === 0)
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" name="is_completed" value="1"
+                       {{ $task->is_completed ? 'checked' : '' }}>
+                Tandai sebagai selesai
+            </label>
+        @else
+            <p class="text-xs text-gray-400">
+                💡 Status selesai otomatis dihitung dari sub-task.
+            </p>
+        @endif
 
         <button type="submit"
                 class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">

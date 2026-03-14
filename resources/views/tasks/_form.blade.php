@@ -21,7 +21,7 @@
         @foreach($categories as $cat)
             <option value="{{ $cat->id }}"
                 {{ old('category_id', $task->category_id ?? '') == $cat->id ? 'selected' : '' }}>
-                {{ $cat->name }}
+                {{ $cat->icon }} {{ $cat->name }}
             </option>
         @endforeach
     </select>

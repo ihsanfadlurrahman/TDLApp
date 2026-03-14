@@ -21,7 +21,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view ('category.create');
+        return view('category.create');
     }
 
     /**
@@ -37,7 +37,7 @@ class CategoryController extends Controller
         Category::create($request->only('name', 'color'));
 
         return redirect()->route('categories.index')
-                         ->with('success', 'Kategori berhasil ditambahkan!');
+            ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
@@ -67,8 +67,17 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category)
     {
-        //
+        // Cek apakah masih ada task
+        if ($category->tasks()->count() > 0) {
+            return redirect()->route('categories.index')
+                ->with('error', "Kategori \"{$category->name}\" tidak bisa dihapus karena masih memiliki {$category->tasks()->count()} task aktif.");
+        }
+
+        $category->delete();
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil dihapus!');
     }
 }

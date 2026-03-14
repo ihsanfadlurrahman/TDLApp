@@ -22,6 +22,8 @@ Route::get('/', function () {
 // Task routes
 Route::resource('tasks', TaskController::class);
 Route::patch('tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
+Route::post('tasks/{task}/subtasks', [TaskController::class, 'storeSubTask'])->name('tasks.subtasks.store');
+Route::delete('subtasks/{subTask}', [TaskController::class, 'destroySubTask'])->name('tasks.subtasks.destroy');
 
 // Category routes
 Route::resource('categories', CategoryController::class);

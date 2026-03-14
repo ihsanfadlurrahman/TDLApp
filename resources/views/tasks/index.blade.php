@@ -22,8 +22,8 @@
 
     <select name="status" class="border rounded px-3 py-2 text-sm">
         <option value="">Semua Status</option>
-        <option value="pending"   {{ request('status') == 'pending'    ? 'selected' : '' }}>Belum Selesai</option>
-        <option value="completed" {{ request('status') == 'completed'  ? 'selected' : '' }}>Selesai</option>
+        <option value="pending"   {{ request('status') == 'pending'   ? 'selected' : '' }}>Belum Selesai</option>
+        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
     </select>
 
     <select name="priority" class="border rounded px-3 py-2 text-sm">
@@ -37,7 +37,7 @@
         <option value="">Semua Kategori</option>
         @foreach($categories as $cat)
             <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
-                {{ $cat->name }}
+                {{ $cat->icon }} {{ $cat->name }}
             </option>
         @endforeach
     </select>
@@ -51,53 +51,84 @@
 {{-- Task List --}}
 <div class="space-y-3">
     @forelse($tasks as $task)
-        <div class="bg-white rounded shadow px-5 py-4 flex items-start justify-between gap-4
-                    {{ $task->is_completed ? 'opacity-60' : '' }}">
+        @php $subCount = $task->subTasks->count(); @endphp
 
-            <div class="flex items-start gap-3">
-                {{-- Toggle Button --}}
-                <form method="POST" action="{{ route('tasks.toggle', $task) }}">
-                    @csrf @method('PATCH')
-                    <button type="submit"
-                            class="mt-1 w-5 h-5 rounded-full border-2 flex-shrink-0
-                                   {{ $task->is_completed ? 'bg-indigo-500 border-indigo-500' : 'border-gray-400' }}">
-                    </button>
-                </form>
+        <div class="bg-white rounded shadow px-5 py-4 {{ $task->is_completed ? 'opacity-60' : '' }}">
+            <div class="flex items-start justify-between gap-4">
 
-                {{-- Info --}}
-                <div>
-                    <p class="font-semibold text-gray-800 {{ $task->is_completed ? 'line-through' : '' }}">
-                        {{ $task->title }}
-                    </p>
-                    <div class="flex gap-2 mt-1 flex-wrap text-xs text-gray-500">
-                        @if($task->category)
-                            <span class="px-2 py-0.5 rounded-full text-white text-xs"
-                                  style="background-color: {{ $task->category->color }}">
-                                {{ $task->category->name }}
+                <div class="flex items-start gap-3 flex-1">
+                    {{-- Toggle Button --}}
+                    <form method="POST" action="{{ route('tasks.toggle', $task) }}">
+                        @csrf @method('PATCH')
+                        <button type="submit"
+                                class="mt-1 w-5 h-5 rounded-full border-2 flex-shrink-0
+                                       {{ $task->is_completed ? 'bg-indigo-500 border-indigo-500' : 'border-gray-400' }}">
+                        </button>
+                    </form>
+
+                    {{-- Info --}}
+                    <div class="flex-1">
+                        <a href="{{ route('tasks.show', $task) }}"
+                           class="font-semibold text-gray-800 hover:text-indigo-600
+                                  {{ $task->is_completed ? 'line-through' : '' }}">
+                            {{ $task->title }}
+                        </a>
+
+                        <div class="flex gap-2 mt-1 flex-wrap text-xs text-gray-500">
+                            @if($task->category)
+                                <span class="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-medium">
+                                    {{ $task->category->icon }} {{ $task->category->name }}
+                                </span>
+                            @endif
+
+                            <span class="{{ $task->priority == 'high' ? 'text-red-500' : ($task->priority == 'medium' ? 'text-yellow-500' : 'text-green-500') }} font-medium">
+                                {{ ucfirst($task->priority) }}
                             </span>
-                        @endif
 
-                        <span class="{{ $task->priority == 'high' ? 'text-red-500' : ($task->priority == 'medium' ? 'text-yellow-500' : 'text-green-500') }} font-medium">
-                            {{ ucfirst($task->priority) }}
-                        </span>
+                            @if($task->due_date)
+                                <span>📅 {{ $task->due_date->format('d M Y') }}</span>
+                            @endif
 
-                        @if($task->due_date)
-                            <span>📅 {{ $task->due_date->format('d M Y') }}</span>
+                            @if($subCount > 0)
+                                <span class="text-gray-400">
+                                    ✅ {{ $task->subTasks->where('is_completed', true)->count() }}/{{ $subCount }} sub-task
+                                </span>
+                            @endif
+                        </div>
+
+                        {{-- Progress Bar (hanya kalau ada sub-task) --}}
+                        @if($subCount > 0)
+                            <div class="mt-2">
+                                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div class="h-1.5 rounded-full transition-all duration-300
+                                                {{ $task->progress == 100 ? 'bg-green-500' : 'bg-indigo-500' }}"
+                                         style="width: {{ $task->progress }}%">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-0.5">{{ $task->progress }}% selesai</p>
+                            </div>
                         @endif
                     </div>
                 </div>
-            </div>
 
-            {{-- Actions --}}
-            <div class="flex gap-2 flex-shrink-0">
-                <a href="{{ route('tasks.edit', $task) }}"
-                   class="text-sm text-indigo-600 hover:underline">Edit</a>
+                {{-- Actions --}}
+                <div class="flex gap-1.5 flex-shrink-0">
+                    <a href="{{ route('tasks.edit', $task) }}" title="Edit"
+                       class="w-8 h-8 flex items-center justify-center rounded-lg
+                              bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition text-base">
+                        ✏️
+                    </a>
+                    <form method="POST" action="{{ route('tasks.destroy', $task) }}"
+                          onsubmit="return confirm('Hapus task ini beserta semua sub-task-nya?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" title="Hapus"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg
+                                       bg-red-50 text-red-500 hover:bg-red-100 transition text-base">
+                            🗑️
+                        </button>
+                    </form>
+                </div>
 
-                <form method="POST" action="{{ route('tasks.destroy', $task) }}"
-                      onsubmit="return confirm('Hapus task ini?')">
-                    @csrf @method('DELETE')
-                    <button class="text-sm text-red-500 hover:underline">Hapus</button>
-                </form>
             </div>
         </div>
     @empty
@@ -112,4 +143,4 @@
     {{ $tasks->links() }}
 </div>
 
-@endsection
+@endsection 
