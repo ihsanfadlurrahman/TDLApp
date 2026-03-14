@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Task extends Model
 {
     protected $fillable = [
+        'user_id',
         'parent_id',
         'category_id',
         'title',
@@ -22,8 +23,14 @@ class Task extends Model
     protected $casts = [
         'is_completed' => 'boolean',
         'due_date'     => 'date',
-        'completed_at' => 'datetime' // tambah ini
+        'completed_at' => 'datetime'
     ];
+
+    // Relasi ke user
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function category(): BelongsTo
     {
@@ -42,7 +49,7 @@ class Task extends Model
         return $this->hasMany(Task::class, 'parent_id');
     }
 
-    // Cek apakah task ini adalah sub-task
+    // Pengecekan apakah task ini adalah sub-task
     public function isSubTask(): bool
     {
         return !is_null($this->parent_id);
@@ -68,7 +75,7 @@ class Task extends Model
 
         $parent->update([
             'is_completed' => $allDone,
-            'completed_at' => $allDone ? now() : null, // tambah ini
+            'completed_at' => $allDone ? now() : null,
         ]);
     }
 

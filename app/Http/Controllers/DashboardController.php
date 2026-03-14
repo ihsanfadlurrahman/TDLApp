@@ -10,7 +10,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // ── Statistik Utama ──────────────────────────────
+        Task::parentOnly()->where('user_id', auth()->id());
+        //  Statistik Utama
         $totalTasks     = Task::parentOnly()->count();
         $completedTasks = Task::parentOnly()->completed()->count();
         $pendingTasks   = Task::parentOnly()->pending()->count();
@@ -18,9 +19,9 @@ class DashboardController extends Controller
                               ->whereDate('due_date', Carbon::today())
                               ->count();
 
-        // ── Progress per Kategori ────────────────────────
+        //  Progress per Kategori
         $categories = Category::with(['tasks' => function ($q) {
-                            $q->parentOnly();
+                            $q->parentOnly()->where('user_id', auth()->id());
                         }])->get()->map(function ($cat) {
                             $total     = $cat->tasks->count();
                             $completed = $cat->tasks->where('is_completed', true)->count();
@@ -33,9 +34,9 @@ class DashboardController extends Controller
                                 'completed' => $completed,
                                 'progress'  => $progress,
                             ];
-                        })->filter(fn($cat) => $cat['total'] > 0); // sembunyiin kategori kosong
+                        })->filter(fn($cat) => $cat['total'] > 0); // Hanya menampilkan kategori yang memiliki task
 
-        // ── Task Jatuh Tempo ─────────────────────────────
+        //  Task yang Jatuh Tempo
         $upcomingTasks = Task::parentOnly()
                              ->pending()
                              ->whereNotNull('due_date')
@@ -53,7 +54,7 @@ class DashboardController extends Controller
                             ->with('category')
                             ->get();
 
-        // ── Selesai Hari Ini ─────────────────────────────
+        //  Task yang selesai hari ini
         $completedToday = Task::parentOnly()
                               ->completed()
                               ->whereDate('completed_at', Carbon::today())

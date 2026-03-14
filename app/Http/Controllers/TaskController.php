@@ -12,6 +12,7 @@ class TaskController extends Controller
     {
         $query = Task::with(['category', 'subTasks'])
             ->parentOnly() // hanya tampilkan parent task
+            ->where('user_id', auth()->id())
             ->latest();
 
         if ($request->filled('status')) {
@@ -53,13 +54,15 @@ class TaskController extends Controller
             'priority'    => 'required|in:low,medium,high',
         ]);
 
-        Task::create($request->only(
-            'title',
-            'description',
-            'category_id',
-            'due_date',
-            'priority'
-        ));
+        Task::create([
+            'user_id'      => auth()->id(),
+            'title'        => $request->title,
+            'description'  => $request->description,
+            'category_id'  => $request->category_id,
+            'due_date'     => $request->due_date,
+            'priority'     => $request->priority,
+            'is_completed' => false,
+        ]);
 
         return redirect()->route('tasks.index')
             ->with('success', 'Task berhasil ditambahkan!');
@@ -67,7 +70,7 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        // Pastiin yang dibuka adalah parent task
+        // Memastikan yang ditampilkan adalah parent task, jika sub-task diarahkan ke parent-nya
         if ($task->isSubTask()) {
             return redirect()->route('tasks.show', $task->parent_id);
         }
@@ -108,7 +111,7 @@ class TaskController extends Controller
 
     public function destroy(Task $task)
     {
-        // Hapus semua sub-task dulu sebelum hapus parent
+        // Hapus semua sub-task, sebelum hapus parent
         $task->subTasks()->delete();
         $task->delete();
 
@@ -143,7 +146,7 @@ class TaskController extends Controller
 
     public function storeSubTask(Request $request, Task $task)
     {
-        // Pastiin parent bukan sub-task (max 2 level)
+        // Memastikan hanya parent task yang bisa ditambahkan sub-task
         if ($task->isSubTask()) {
             return back()->with('error', 'Sub-task tidak bisa punya sub-task lagi.');
         }

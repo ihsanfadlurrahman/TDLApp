@@ -14,26 +14,26 @@
 
 {{-- Filter & Search --}}
 <form method="GET" action="{{ route('tasks.index') }}"
-      class="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+      class="bg-white p-4 rounded shadow mb-6 space-y-2 md:space-y-0 md:grid md:grid-cols-4 md:gap-3">
 
     <input type="text" name="search" value="{{ request('search') }}"
            placeholder="Cari task..."
-           class="border rounded px-3 py-2 text-sm col-span-2 md:col-span-1">
+           class="w-full border rounded px-3 py-2 text-sm">
 
-    <select name="status" class="border rounded px-3 py-2 text-sm">
+    <select name="status" class="w-full border rounded px-3 py-2 text-sm">
         <option value="">Semua Status</option>
         <option value="pending"   {{ request('status') == 'pending'   ? 'selected' : '' }}>Belum Selesai</option>
         <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
     </select>
 
-    <select name="priority" class="border rounded px-3 py-2 text-sm">
+    <select name="priority" class="w-full border rounded px-3 py-2 text-sm">
         <option value="">Semua Prioritas</option>
         <option value="high"   {{ request('priority') == 'high'   ? 'selected' : '' }}>🔴 High</option>
         <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>🟡 Medium</option>
         <option value="low"    {{ request('priority') == 'low'    ? 'selected' : '' }}>🟢 Low</option>
     </select>
 
-    <select name="category_id" class="border rounded px-3 py-2 text-sm">
+    <select name="category_id" class="w-full border rounded px-3 py-2 text-sm">
         <option value="">Semua Kategori</option>
         @foreach($categories as $cat)
             <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
@@ -43,9 +43,10 @@
     </select>
 
     <button type="submit"
-            class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700 col-span-2 md:col-span-4">
+            class="w-full bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700 md:col-span-4">
         Filter
     </button>
+
 </form>
 
 {{-- Task List --}}
@@ -143,4 +144,4 @@
     {{ $tasks->links() }}
 </div>
 
-@endsection 
+@endsection

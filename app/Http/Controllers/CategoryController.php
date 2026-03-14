@@ -12,7 +12,11 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::withCount('tasks')->latest()->get();
+        $categories = Category::withCount('tasks')
+            ->with('tasks')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
         return view('category.index', compact('categories'));
     }
 
@@ -34,7 +38,11 @@ class CategoryController extends Controller
             'color' => 'required|regex:/^#[0-9A-Fa-f]{6}$/'
         ]);
 
-        Category::create($request->only('name', 'color'));
+        Category::create([
+            'user_id' => auth()->id(),
+            'name'    => $request->name,
+            'color'   => $request->color
+        ]);
 
         return redirect()->route('categories.index')
             ->with('success', 'Kategori berhasil ditambahkan!');
@@ -69,7 +77,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        // Cek apakah masih ada task
+        // Pengecekan apakah kategori memiliki task aktif sebelum dihapus
         if ($category->tasks()->count() > 0) {
             return redirect()->route('categories.index')
                 ->with('error', "Kategori \"{$category->name}\" tidak bisa dihapus karena masih memiliki {$category->tasks()->count()} task aktif.");
