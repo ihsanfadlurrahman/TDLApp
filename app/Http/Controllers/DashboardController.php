@@ -10,55 +10,59 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        Task::parentOnly()->where('user_id', auth()->id());
-        //  Statistik Utama
-        $totalTasks     = Task::parentOnly()->count();
-        $completedTasks = Task::parentOnly()->completed()->count();
-        $pendingTasks   = Task::parentOnly()->pending()->count();
-        $dueTodayTasks  = Task::parentOnly()->pending()
-                              ->whereDate('due_date', Carbon::today())
-                              ->count();
+        $userId = auth()->id();
 
-        //  Progress per Kategori
-        $categories = Category::with(['tasks' => function ($q) {
-                            $q->parentOnly()->where('user_id', auth()->id());
-                        }])->get()->map(function ($cat) {
-                            $total     = $cat->tasks->count();
-                            $completed = $cat->tasks->where('is_completed', true)->count();
-                            $progress  = $total > 0 ? round(($completed / $total) * 100) : 0;
+        // Statistik Utama
+        $totalTasks     = Task::parentOnly()->where('user_id', $userId)->count();
+        $completedTasks = Task::parentOnly()->where('user_id', $userId)->completed()->count();
+        $pendingTasks   = Task::parentOnly()->where('user_id', $userId)->pending()->count();
+        $dueTodayTasks  = Task::parentOnly()->where('user_id', $userId)->pending()
+            ->whereDate('due_date', Carbon::today())
+            ->count();
 
-                            return [
-                                'name'      => $cat->name,
-                                'icon'      => $cat->icon,
-                                'total'     => $total,
-                                'completed' => $completed,
-                                'progress'  => $progress,
-                            ];
-                        })->filter(fn($cat) => $cat['total'] > 0); // Hanya menampilkan kategori yang memiliki task
+        // Progress per Kategori
+        $categories = Category::with(['tasks' => function ($q) use ($userId) {
+            $q->parentOnly()->where('user_id', $userId);
+        }])
+            ->where('user_id', $userId) 
+            ->get()
+            ->map(function ($cat) {
+                $total     = $cat->tasks->count();
+                $completed = $cat->tasks->where('is_completed', true)->count();
+                $progress  = $total > 0 ? round(($completed / $total) * 100) : 0;
 
-        //  Task yang Jatuh Tempo
-        $upcomingTasks = Task::parentOnly()
-                             ->pending()
-                             ->whereNotNull('due_date')
-                             ->whereDate('due_date', '>=', Carbon::today())
-                             ->orderBy('due_date')
-                             ->take(5)
-                             ->with('category')
-                             ->get();
+                return [
+                    'name'      => $cat->name,
+                    'icon'      => $cat->icon,
+                    'total'     => $total,
+                    'completed' => $completed,
+                    'progress'  => $progress,
+                ];
+            })->filter(fn($cat) => $cat['total'] > 0);
 
-        $overdueTasks = Task::parentOnly()
-                            ->pending()
-                            ->whereNotNull('due_date')
-                            ->whereDate('due_date', '<', Carbon::today())
-                            ->orderBy('due_date')
-                            ->with('category')
-                            ->get();
+        // Task Jatuh Tempo
+        $upcomingTasks = Task::parentOnly()->where('user_id', $userId)
+            ->pending()
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '>=', Carbon::today())
+            ->orderBy('due_date')
+            ->take(5)
+            ->with('category')
+            ->get();
 
-        //  Task yang selesai hari ini
-        $completedToday = Task::parentOnly()
-                              ->completed()
-                              ->whereDate('completed_at', Carbon::today())
-                              ->count();
+        $overdueTasks = Task::parentOnly()->where('user_id', $userId)
+            ->pending()
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '<', Carbon::today())
+            ->orderBy('due_date')
+            ->with('category')
+            ->get();
+
+        // Task selesai hari ini
+        $completedToday = Task::parentOnly()->where('user_id', $userId)
+            ->completed()
+            ->whereDate('completed_at', Carbon::today())
+            ->count();
 
         return view('dashboard', compact(
             'totalTasks',
