@@ -15,6 +15,7 @@
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="{{ route('tasks.index') }}" class="text-xl font-bold">✅ MyList</a>
             <div class="flex gap-4">
+                <a href="{{ route('dashboard') }}" class="hover:underline">Dashboard</a>
                 <a href="{{ route('tasks.index') }}" class="hover:underline">Tasks</a>
                 <a href="{{ route('categories.index') }}" class="hover:underline">Kategori</a>
             </div>
