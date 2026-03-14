@@ -14,6 +14,7 @@ class Task extends Model
         'title',
         'description',
         'is_completed',
+        'completed_at',
         'due_date',
         'priority'
     ];
@@ -21,6 +22,7 @@ class Task extends Model
     protected $casts = [
         'is_completed' => 'boolean',
         'due_date'     => 'date',
+        'completed_at' => 'datetime' // tambah ini
     ];
 
     public function category(): BelongsTo
@@ -64,7 +66,10 @@ class Task extends Model
         $parent = $this->parent;
         $allDone = $parent->subTasks()->pending()->count() === 0;
 
-        $parent->update(['is_completed' => $allDone]);
+        $parent->update([
+            'is_completed' => $allDone,
+            'completed_at' => $allDone ? now() : null, // tambah ini
+        ]);
     }
 
     // Scope: hanya parent task

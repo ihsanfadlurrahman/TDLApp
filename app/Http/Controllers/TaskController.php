@@ -11,8 +11,8 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $query = Task::with(['category', 'subTasks'])
-                     ->parentOnly() // hanya tampilkan parent task
-                     ->latest();
+            ->parentOnly() // hanya tampilkan parent task
+            ->latest();
 
         if ($request->filled('status')) {
             if ($request->status === 'completed') $query->completed();
@@ -54,11 +54,15 @@ class TaskController extends Controller
         ]);
 
         Task::create($request->only(
-            'title', 'description', 'category_id', 'due_date', 'priority'
+            'title',
+            'description',
+            'category_id',
+            'due_date',
+            'priority'
         ));
 
         return redirect()->route('tasks.index')
-                         ->with('success', 'Task berhasil ditambahkan!');
+            ->with('success', 'Task berhasil ditambahkan!');
     }
 
     public function show(Task $task)
@@ -90,11 +94,16 @@ class TaskController extends Controller
         ]);
 
         $task->update($request->only(
-            'title', 'description', 'category_id', 'due_date', 'priority', 'is_completed'
+            'title',
+            'description',
+            'category_id',
+            'due_date',
+            'priority',
+            'is_completed'
         ));
 
         return redirect()->route('tasks.index')
-                         ->with('success', 'Task berhasil diupdate!');
+            ->with('success', 'Task berhasil diupdate!');
     }
 
     public function destroy(Task $task)
@@ -104,26 +113,32 @@ class TaskController extends Controller
         $task->delete();
 
         return redirect()->route('tasks.index')
-                         ->with('success', 'Task berhasil dihapus!');
+            ->with('success', 'Task berhasil dihapus!');
     }
 
     // Toggle complete/incomplete
     public function toggle(Task $task)
     {
-        // Kalau parent task, toggle semua sub-task sekalian
         if (!$task->isSubTask()) {
             $newStatus = !$task->is_completed;
-            $task->subTasks()->update(['is_completed' => $newStatus]);
-            $task->update(['is_completed' => $newStatus]);
+            $task->subTasks()->update([
+                'is_completed' => $newStatus,
+                'completed_at' => $newStatus ? now() : null,
+            ]);
+            $task->update([
+                'is_completed' => $newStatus,
+                'completed_at' => $newStatus ? now() : null,
+            ]);
         } else {
-            // Kalau sub-task, toggle lalu cek parent
-            $task->update(['is_completed' => !$task->is_completed]);
+            $task->update([
+                'is_completed' => !$task->is_completed,
+                'completed_at' => !$task->is_completed ? now() : null,
+            ]);
             $task->checkAndCompleteParent();
         }
 
         return back()->with('success', 'Status task berhasil diubah!');
     }
-
     // ── Sub-task ──────────────────────────────────────────
 
     public function storeSubTask(Request $request, Task $task)
@@ -156,7 +171,7 @@ class TaskController extends Controller
         $parent = Task::find($parentId);
         if ($parent) {
             $allDone = $parent->subTasks()->pending()->count() === 0
-                       && $parent->subTasks()->count() > 0;
+                && $parent->subTasks()->count() > 0;
             $parent->update(['is_completed' => $allDone]);
         }
 
