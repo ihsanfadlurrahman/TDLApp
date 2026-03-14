@@ -35,13 +35,13 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name'  => 'required|string|max:255|unique:categories',
-            'color' => 'required|regex:/^#[0-9A-Fa-f]{6}$/'
+            'icon' => 'required|string'
         ]);
 
         Category::create([
             'user_id' => auth()->id(),
             'name'    => $request->name,
-            'color'   => $request->color
+            'icon'   => $request->icon
         ]);
 
         return redirect()->route('categories.index')

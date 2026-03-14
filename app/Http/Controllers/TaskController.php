@@ -33,14 +33,14 @@ class TaskController extends Controller
         }
 
         $tasks      = $query->paginate(10)->withQueryString();
-        $categories = Category::all();
+        $categories = Category::where('user_id', auth()->id())->get(); // Filter kategori milik user yang sedang login
 
         return view('tasks.index', compact('tasks', 'categories'));
     }
 
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::where('user_id', auth()->id())->get(); // Filter kategori milik user yang sedang login
         return view('tasks.create', compact('categories'));
     }
 
@@ -81,7 +81,7 @@ class TaskController extends Controller
 
     public function edit(Task $task)
     {
-        $categories = Category::all();
+        $categories = Category::where('user_id', auth()->id())->get(); // Filter kategori milik user yang sedang login
         return view('tasks.edit', compact('task', 'categories'));
     }
 

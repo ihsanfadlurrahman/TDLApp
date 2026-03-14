@@ -13,7 +13,7 @@
         @forelse($categories as $cat)
             <div class="bg-white rounded shadow p-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-4 h-4 rounded-full" style="background-color: {{ $cat->color }}"></div>
+                    <span class="text-2xl">{{ $cat->icon }}</span>
                     <div>
                         <p class="font-semibold text-gray-800">{{ $cat->name }}</p>
                         <p class="text-xs text-gray-400">{{ $cat->tasks_count }} task</p>
