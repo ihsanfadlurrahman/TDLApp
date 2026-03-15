@@ -7,85 +7,89 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $categories = Category::withCount('tasks')
-            ->with('tasks')
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get();
+                               ->with('tasks')
+                               ->where('user_id', auth()->id())
+                               ->latest()
+                               ->get();
+
         return view('category.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('category.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'name'  => 'required|string|max:255|unique:categories',
-            'icon' => 'required|string'
+            'name' => 'required|string|max:255|unique:categories,name,NULL,id,user_id,' . auth()->id(),
+            'icon' => 'required|string',
         ]);
 
         Category::create([
             'user_id' => auth()->id(),
             'name'    => $request->name,
-            'icon'   => $request->icon
+            'icon'    => $request->icon,
         ]);
 
         return redirect()->route('categories.index')
-            ->with('success', 'Kategori berhasil ditambahkan!');
+                         ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Category $category)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
-    {
-        // Pengecekan apakah kategori memiliki task aktif sebelum dihapus
-        if ($category->tasks()->count() > 0) {
-            return redirect()->route('categories.index')
-                ->with('error', "Kategori \"{$category->name}\" tidak bisa dihapus karena masih memiliki {$category->tasks()->count()} task aktif.");
+        // Pastiin kategori milik user yang login
+        if ($category->user_id !== auth()->id()) {
+            abort(403);
         }
 
-        $category->delete();
+        return view('category.edit', compact('category'));
+    }
+
+    public function update(Request $request, Category $category)
+    {
+        if ($category->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id . ',id,user_id,' . auth()->id(),
+            'icon' => 'required|string',
+        ]);
+
+        $category->update([
+            'name' => $request->name,
+            'icon' => $request->icon,
+        ]);
 
         return redirect()->route('categories.index')
-            ->with('success', 'Kategori berhasil dihapus!');
+                         ->with('success', 'Kategori berhasil diupdate!');
+    }
+
+    public function destroy(Category $category)
+    {
+        if ($category->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $pendingTasks = $category->tasks()->pending()->count();
+
+        if ($pendingTasks > 0) {
+            return redirect()->route('category.index')
+                             ->with('error', "Kategori \"{$category->name}\" tidak bisa dihapus karena masih memiliki {$pendingTasks} task yang belum selesai.");
+        }
+
+        $totalTasks = $category->tasks()->count();
+        $category->delete();
+
+        $message = $totalTasks > 0
+            ? "Kategori \"{$category->name}\" berhasil dihapus. {$totalTasks} task tetap tersimpan tanpa kategori."
+            : "Kategori \"{$category->name}\" berhasil dihapus.";
+
+        return redirect()->route('category.index')->with('success', $message);
     }
 }

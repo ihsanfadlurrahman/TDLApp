@@ -24,7 +24,7 @@ class DashboardController extends Controller
         $categories = Category::with(['tasks' => function ($q) use ($userId) {
             $q->parentOnly()->where('user_id', $userId);
         }])
-            ->where('user_id', $userId) 
+            ->where('user_id', $userId)
             ->get()
             ->map(function ($cat) {
                 $total     = $cat->tasks->count();
@@ -64,6 +64,30 @@ class DashboardController extends Controller
             ->whereDate('completed_at', Carbon::today())
             ->count();
 
+        // Tambah di bawah $completedToday
+        // Focus Task — kombinasi high priority + due date ≤ 7 hari
+        $focusTask = Task::parentOnly()
+            ->where('user_id', $userId)
+            ->pending()
+            ->where(function ($q) {
+                $q->where('priority', 'high')
+                    ->orWhere(function ($q2) {
+                        $q2->whereNotNull('due_date')
+                            ->whereDate('due_date', '<=', Carbon::today()->addDays(7));
+                    });
+            })
+            ->orderByRaw("
+                     CASE
+                         WHEN priority = 'high' AND due_date IS NOT NULL AND due_date <= ? THEN 1
+                         WHEN priority = 'high' THEN 2
+                         WHEN due_date IS NOT NULL AND due_date <= ? THEN 3
+                         ELSE 4
+                     END
+                 ", [Carbon::today()->addDays(7), Carbon::today()->addDays(7)])
+            ->orderBy('due_date')
+            ->with('category')
+            ->first();
+
         return view('dashboard', compact(
             'totalTasks',
             'completedTasks',
@@ -72,7 +96,8 @@ class DashboardController extends Controller
             'categories',
             'upcomingTasks',
             'overdueTasks',
-            'completedToday'
+            'completedToday',
+            'focusTask' // ← tambah ini
         ));
     }
 }

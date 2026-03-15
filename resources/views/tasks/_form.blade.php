@@ -1,25 +1,25 @@
-{{-- Title --}}
 <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">Judul Task *</label>
+    <label class="block text-xs font-semibold text-white/30 mb-2 uppercase tracking-widest">Judul Task *</label>
     <input type="text" name="title" value="{{ old('title', $task->title ?? '') }}"
-           class="w-full border rounded px-3 py-2 @error('title') border-red-500 @enderror">
-    @error('title') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+           placeholder="Contoh: Bikin fitur login"
+           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition @error('title') border-red-500/50 @enderror">
+    @error('title') <p class="text-red-400 text-xs mt-1.5">{{ $message }}</p> @enderror
 </div>
 
-{{-- Description --}}
 <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+    <label class="block text-xs font-semibold text-white/30 mb-2 uppercase tracking-widest">Deskripsi</label>
     <textarea name="description" rows="3"
-              class="w-full border rounded px-3 py-2">{{ old('description', $task->description ?? '') }}</textarea>
+              placeholder="Tambahkan deskripsi..."
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition resize-none">{{ old('description', $task->description ?? '') }}</textarea>
 </div>
 
-{{-- Category --}}
 <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-    <select name="category_id" class="w-full border rounded px-3 py-2">
-        <option value="">-- Tanpa Kategori --</option>
+    <label class="block text-xs font-semibold text-white/30 mb-2 uppercase tracking-widest">Kategori</label>
+    <select name="category_id"
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-blue-500/50 transition">
+        <option value="" class="bg-[#111d3d]">-- Tanpa Kategori --</option>
         @foreach($categories as $cat)
-            <option value="{{ $cat->id }}"
+            <option value="{{ $cat->id }}" class="bg-[#111d3d]"
                 {{ old('category_id', $task->category_id ?? '') == $cat->id ? 'selected' : '' }}>
                 {{ $cat->icon }} {{ $cat->name }}
             </option>
@@ -27,13 +27,13 @@
     </select>
 </div>
 
-{{-- Priority & Due Date --}}
-<div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-2 gap-4">
     <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Prioritas *</label>
-        <select name="priority" class="w-full border rounded px-3 py-2">
-            @foreach(['low' => '🟢 Low', 'medium' => '🟡 Medium', 'high' => '🔴 High'] as $val => $label)
-                <option value="{{ $val }}"
+        <label class="block text-xs font-semibold text-white/30 mb-2 uppercase tracking-widest">Prioritas *</label>
+        <select name="priority"
+                class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-blue-500/50 transition">
+            @foreach(['low' => 'Low', 'medium' => 'Medium', 'high' => 'High'] as $val => $label)
+                <option value="{{ $val }}" class="bg-[#111d3d]"
                     {{ old('priority', $task->priority ?? 'medium') == $val ? 'selected' : '' }}>
                     {{ $label }}
                 </option>
@@ -41,9 +41,9 @@
         </select>
     </div>
     <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+        <label class="block text-xs font-semibold text-white/30 mb-2 uppercase tracking-widest">Due Date</label>
         <input type="date" name="due_date"
                value="{{ old('due_date', isset($task) && $task->due_date ? $task->due_date->format('Y-m-d') : '') }}"
-               class="w-full border rounded px-3 py-2">
+               class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-blue-500/50 transition">
     </div>
 </div>

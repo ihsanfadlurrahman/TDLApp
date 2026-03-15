@@ -1,0 +1,288 @@
+/* ── Dark Mode (default) ── */
+:root {
+    --bg-base: #0a0f1e;
+    --bg-card: #0d1530;
+    --bg-hover: rgba(255, 255, 255, 0.05);
+    --border: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-muted: rgba(255, 255, 255, 0.3);
+    --pill-bg: rgba(37, 99, 235, 0.12);
+    --pill-color: #93c5fd;
+    --pill-border: rgba(37, 99, 235, 0.2);
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --progress-bg: rgba(255, 255, 255, 0.05);
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --success-border: rgba(16, 185, 129, 0.2);
+    --success-text: #34d399;
+    --error-bg: rgba(239, 68, 68, 0.1);
+    --error-border: rgba(239, 68, 68, 0.2);
+    --error-text: #f87171;
+}
+
+/* ── Light Mode ── */
+html.light {
+    --bg-base: #f0f4ff;
+    --bg-card: #ffffff;
+    --bg-hover: rgba(37, 99, 235, 0.05);
+    --border: rgba(37, 99, 235, 0.12);
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #94a3b8;
+    --pill-bg: rgba(37, 99, 235, 0.08);
+    --pill-color: #1d4ed8;
+    --pill-border: rgba(37, 99, 235, 0.15);
+    --input-bg: #f8fafc;
+    --progress-bg: #e2e8f0;
+    --success-bg: rgba(16, 185, 129, 0.08);
+    --success-border: rgba(16, 185, 129, 0.2);
+    --success-text: #059669;
+    --error-bg: rgba(239, 68, 68, 0.08);
+    --error-border: rgba(239, 68, 68, 0.2);
+    --error-text: #dc2626;
+}
+
+body {
+    background-color: var(--bg-base);
+    font-family: "DM Sans", sans-serif;
+    color: var(--text-primary);
+    transition:
+        background-color 0.3s,
+        color 0.3s;
+}
+
+.navy-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    transition:
+        background 0.3s,
+        border-color 0.3s;
+}
+
+.glass {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+.btn-primary {
+    background: #2563eb;
+    transition:
+        background 0.2s,
+        transform 0.15s;
+}
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.pill-blue {
+    background: var(--pill-bg);
+    color: var(--pill-color);
+    border: 1px solid var(--pill-border);
+}
+
+.progress-blue {
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
+.progress-green {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+/* ── Toggle Button ── */
+.theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        background 0.2s,
+        border-color 0.2s;
+    font-size: 16px;
+}
+.theme-toggle:hover {
+    background: var(--bg-hover);
+}
+
+/* ── Light mode overrides ── */
+html.light .text-white {
+    color: var(--text-primary) !important;
+}
+html.light .text-white\/90 {
+    color: var(--text-primary) !important;
+}
+html.light .text-white\/80 {
+    color: var(--text-secondary) !important;
+}
+html.light .text-white\/60 {
+    color: var(--text-secondary) !important;
+}
+html.light .text-white\/50 {
+    color: var(--text-secondary) !important;
+}
+html.light .text-white\/40 {
+    color: var(--text-muted) !important;
+}
+html.light .text-white\/30 {
+    color: var(--text-muted) !important;
+}
+html.light .text-white\/20 {
+    color: #cbd5e1 !important;
+}
+html.light .bg-white\/5 {
+    background: var(--input-bg) !important;
+}
+html.light .bg-white\/5:hover {
+    background: var(--bg-hover) !important;
+}
+html.light .border-white\/10 {
+    border-color: var(--border) !important;
+}
+html.light .border-white\/5 {
+    border-color: var(--border) !important;
+}
+html.light .border-white\/8 {
+    border-color: var(--border) !important;
+}
+html.light .placeholder-white\/20::placeholder {
+    color: #94a3b8 !important;
+}
+html.light .placeholder-white\/20::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+    background: var(--input-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.light select option {
+    background: #ffffff;
+    color: #0f172a;
+}
+/* Check button border di light mode */
+html.light .border-white\/20 {
+    border-color: #94a3b8 !important;
+}
+html.light .hover\:border-blue-400:hover {
+    border-color: #3b82f6 !important;
+}
+
+/* Teks sub-task di light mode */
+html.light .text-white\/70 {
+    color: #334155 !important;
+}
+html.light .text-white\/20 {
+    color: #cbd5e1 !important;
+}
+
+/* Check button done tetap biru */
+html.light .bg-blue-600 {
+    background: #2563eb !important;
+}
+html.light .border-blue-600 {
+    border-color: #2563eb !important;
+}
+
+/* Border subtask separator */
+html.light .border-white\/5 {
+    border-color: #e2e8f0 !important;
+}
+
+/* Placeholder input tambah subtask */
+html.light .placeholder-white\/20::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Progress bar background */
+html.light .bg-white\/5 {
+    background: #e2e8f0 !important;
+}
+
+/* Text progress % */
+html.light .text-white\/30 {
+    color: #94a3b8 !important;
+}
+
+html.light .bg-blue-600\/20 {
+    background: rgba(37, 99, 235, 0.1) !important;
+}
+html.light .bg-blue-900 {
+    background: #dbeafe !important;
+}
+html.light .border-blue-400 {
+    border-color: #93c5fd !important;
+}
+html.light .text-blue-300 {
+    color: #1d4ed8 !important;
+}
+html.light .border-blue-600\/25 {
+    border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+html.light .bg-emerald-500\/10 {
+    background: var(--success-bg) !important;
+}
+html.light .border-emerald-500\/20 {
+    border-color: var(--success-border) !important;
+}
+html.light .text-emerald-400 {
+    color: var(--success-text) !important;
+}
+html.light .text-emerald-500\/60 {
+    color: var(--success-text) !important;
+}
+html.light .text-emerald-500\/70 {
+    color: var(--success-text) !important;
+}
+
+html.light .bg-red-500\/10 {
+    background: var(--error-bg) !important;
+}
+html.light .border-red-500\/20 {
+    border-color: var(--error-border) !important;
+}
+html.light .text-red-400 {
+    color: var(--error-text) !important;
+}
+html.light .text-amber-400 {
+    color: #d97706 !important;
+}
+
+html.light .hover\:bg-blue-500\/20:hover {
+    background: rgba(37, 99, 235, 0.08) !important;
+}
+html.light .hover\:bg-red-500\/20:hover {
+    background: rgba(239, 68, 68, 0.08) !important;
+}
+html.light .hover\:border-blue-500\/30:hover {
+    border-color: rgba(37, 99, 235, 0.3) !important;
+}
+html.light .hover\:border-red-500\/30:hover {
+    border-color: rgba(239, 68, 68, 0.3) !important;
+}
+html.light .hover\:text-blue-300:hover {
+    color: #1d4ed8 !important;
+}
+
+html.light .opacity-40 {
+    opacity: 0.35 !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+}
+html.light input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none;
+}
