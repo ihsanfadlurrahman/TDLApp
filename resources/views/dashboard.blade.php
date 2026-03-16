@@ -41,6 +41,7 @@
     </div>
 
     {{-- Focus Task --}}
+    {{-- Focus Task --}}
     <div class="mb-6">
         @if ($focusTask)
             @php
@@ -87,7 +88,6 @@
                             {{ $focusTask->category->icon }} {{ $focusTask->category->name }}
                         </span>
                     @endif
-
                     @if ($focusTask->due_date)
                         <span class="text-xs px-2.5 py-0.5 rounded-lg font-medium"
                             style="{{ $isOverdue
@@ -111,7 +111,7 @@
                     @endif
                 </div>
 
-                {{-- Progress (kalau ada subtask) --}}
+                {{-- Progress --}}
                 @if ($focusTask->subTasks->count() > 0)
                     <div class="mb-4">
                         <div class="flex justify-between text-xs text-white/40 mb-1.5">
@@ -121,21 +121,97 @@
                         </div>
                         <div class="w-full bg-white/5 rounded-full h-2">
                             <div class="h-2 rounded-full transition-all duration-700 progress-blue"
-                                style="width: {{ $focusTask->progress }}%">
-                            </div>
+                                style="width: {{ $focusTask->progress }}%"></div>
                         </div>
                         <p class="text-xs text-white/30 mt-1">{{ $focusTask->progress }}% selesai</p>
                     </div>
                 @endif
 
-                {{-- CTA --}}
-                <a href="{{ route('tasks.show', $focusTask) }}"
-                    class="inline-flex items-center gap-2 btn-primary px-4 py-2 rounded-xl text-sm font-semibold text-white">
-                    Kerjain sekarang →
-                </a>
+                {{-- CTA + Other Tasks Badge --}}
+                <div class="flex items-center gap-3 flex-wrap">
+                    <a href="{{ route('tasks.show', $focusTask) }}"
+                        class="inline-flex items-center gap-2 btn-primary px-4 py-2 rounded-xl text-sm font-semibold text-white">
+                        Kerjain sekarang →
+                    </a>
+
+                    {{-- Badge "N task lainnya" — hanya muncul kalau ada lebih dari 1 task --}}
+                    @if ($otherFocusTasks->count() > 0)
+                        <button onclick="toggleOtherTasks()" id="other-tasks-btn"
+                            class="inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl transition"
+                            style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.5);">
+                            <span id="other-tasks-icon">▼</span>
+                            <span>{{ $otherFocusTasks->count() }} task lainnya yang deadline-nya dekat</span>
+                        </button>
+                    @endif
+                </div>
+
+                {{-- Expandable other tasks --}}
+                @if ($otherFocusTasks->count() > 0)
+                    <div id="other-tasks-list" class="hidden mt-4 pt-4 border-t space-y-2"
+                        style="border-color: rgba(255,255,255,0.08);">
+                        @foreach ($otherFocusTasks as $other)
+                            @php
+                                $otherDays = $other->due_date
+                                    ? Carbon\Carbon::today()->diffInDays($other->due_date, false)
+                                    : null;
+                            @endphp
+                            <a href="{{ route('tasks.show', $other) }}"
+                                class="flex items-center justify-between px-4 py-3 rounded-xl hover:border-blue-500/30 transition group"
+                                style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    {{-- Priority dot --}}
+                                    <div
+                                        class="w-2 h-2 rounded-full flex-shrink-0
+                                            {{ $other->priority === 'high' ? 'bg-red-400' : ($other->priority === 'medium' ? 'bg-amber-400' : 'bg-green-400') }}">
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p
+                                            class="text-sm font-medium text-white/80 group-hover:text-blue-300 transition truncate">
+                                            {{ $other->title }}
+                                        </p>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            @if ($other->category)
+                                                <span class="text-xs text-white/30">{{ $other->category->icon }}
+                                                    {{ $other->category->name }}</span>
+                                            @endif
+                                            <span class="text-xs text-white/20">•</span>
+                                            <span
+                                                class="text-xs font-medium
+                                                     {{ $other->priority === 'high' ? 'text-red-400' : ($other->priority === 'medium' ? 'text-amber-400' : 'text-green-400') }}">
+                                                {{ ucfirst($other->priority) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Due date badge --}}
+                                <div class="flex items-center gap-2 flex-shrink-0 ml-3">
+                                    @if ($other->due_date)
+                                        <span class="text-xs px-2 py-0.5 rounded-lg"
+                                            style="{{ $otherDays !== null && $otherDays < 0
+                                                ? 'background:rgba(239,68,68,0.15);color:#f87171;'
+                                                : ($otherDays === 0
+                                                    ? 'background:rgba(245,158,11,0.15);color:#fbbf24;'
+                                                    : 'background:rgba(37,99,235,0.12);color:#93c5fd;') }}">
+                                            @if ($otherDays !== null && $otherDays < 0)
+                                                Terlambat {{ abs($otherDays) }}h
+                                            @elseif($otherDays === 0)
+                                                Hari ini!
+                                            @elseif($otherDays <= 3)
+                                                {{ $otherDays }} hari lagi
+                                            @else
+                                                {{ $other->due_date->format('d M') }}
+                                            @endif
+                                        </span>
+                                    @endif
+                                    <span class="text-white/20 group-hover:text-blue-300 transition text-xs">→</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         @else
-            {{-- Pesan motivasi kalau ga ada task yang memenuhi syarat --}}
             <div class="navy-card rounded-2xl p-6 flex items-center gap-4">
                 <div class="text-4xl">🎉</div>
                 <div>
@@ -146,6 +222,21 @@
             </div>
         @endif
     </div>
+
+    <script>
+        function toggleOtherTasks() {
+            const list = document.getElementById('other-tasks-list');
+            const btn = document.getElementById('other-tasks-btn');
+            const icon = document.getElementById('other-tasks-icon');
+            const isHidden = list.classList.contains('hidden');
+
+            list.classList.toggle('hidden');
+            icon.textContent = isHidden ? '▲' : '▼';
+            btn.style.color = isHidden ? '#93c5fd' : 'rgba(255,255,255,0.5)';
+            btn.style.borderColor = isHidden ? 'rgba(37,99,235,0.3)' : 'rgba(255,255,255,0.1)';
+            btn.style.background = isHidden ? 'rgba(37,99,235,0.1)' : 'rgba(255,255,255,0.06)';
+        }
+    </script>
 
     {{-- Bottom Grid --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

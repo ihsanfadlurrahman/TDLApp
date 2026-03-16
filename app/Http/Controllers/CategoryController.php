@@ -90,6 +90,6 @@ class CategoryController extends Controller
             ? "Kategori \"{$category->name}\" berhasil dihapus. {$totalTasks} task tetap tersimpan tanpa kategori."
             : "Kategori \"{$category->name}\" berhasil dihapus.";
 
-        return redirect()->route('category.index')->with('success', $message);
+        return redirect()->route('categories.index')->with('success', $message);
     }
 }

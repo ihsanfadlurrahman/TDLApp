@@ -64,9 +64,8 @@ class DashboardController extends Controller
             ->whereDate('completed_at', Carbon::today())
             ->count();
 
-        // Tambah di bawah $completedToday
         // Focus Task — kombinasi high priority + due date ≤ 7 hari
-        $focusTask = Task::parentOnly()
+        $focusTasks = Task::parentOnly()
             ->where('user_id', $userId)
             ->pending()
             ->where(function ($q) {
@@ -77,16 +76,20 @@ class DashboardController extends Controller
                     });
             })
             ->orderByRaw("
-                     CASE
-                         WHEN priority = 'high' AND due_date IS NOT NULL AND due_date <= ? THEN 1
-                         WHEN priority = 'high' THEN 2
-                         WHEN due_date IS NOT NULL AND due_date <= ? THEN 3
-                         ELSE 4
-                     END
-                 ", [Carbon::today()->addDays(7), Carbon::today()->addDays(7)])
+                      CASE
+                          WHEN priority = 'high' AND due_date IS NOT NULL AND due_date <= ? THEN 1
+                          WHEN priority = 'high' THEN 2
+                          WHEN due_date IS NOT NULL AND due_date <= ? THEN 3
+                          ELSE 4
+                      END
+                  ", [Carbon::today()->addDays(7), Carbon::today()->addDays(7)])
             ->orderBy('due_date')
-            ->with('category')
-            ->first();
+            ->orderByRaw("(SELECT COUNT(*) FROM tasks sub WHERE sub.parent_id = tasks.id AND sub.is_completed = 0) DESC")
+            ->with(['category', 'subTasks'])
+            ->get();
+
+        $focusTask       = $focusTasks->first();        // task utama yang ditampilkan
+        $otherFocusTasks = $focusTasks->skip(1)->values(); // task lainnya
 
         return view('dashboard', compact(
             'totalTasks',
@@ -97,7 +100,8 @@ class DashboardController extends Controller
             'upcomingTasks',
             'overdueTasks',
             'completedToday',
-            'focusTask' // ← tambah ini
+            'focusTask',
+            'otherFocusTasks' // ← tambah otherFocusTasks
         ));
     }
 }
