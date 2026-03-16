@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register — TaskFlow</title>
+    <title>Register — MyTugas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Syne:wght@700;800&display=swap"
         rel="stylesheet">
@@ -21,7 +21,7 @@
         <div class="left-content">
             <div class="form-brand">
                 <div class="form-brand-icon">✓</div>
-                <span class="form-brand-name">TaskFlow</span>
+                <span class="form-brand-name">MyTugas</span>
             </div>
             <h1 class="left-heading">Mulai perjalanan<br><span>produktif</span><br>kamu</h1>
             <p class="left-sub">Daftar sekarang dan kelola semua task kamu dalam satu tempat yang rapi.</p>
@@ -60,7 +60,7 @@
                     style="width:36px;height:36px;background:linear-gradient(135deg,#10b981,#06b6d4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">
                     ✓</div>
                 <span
-                    style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:-0.5px;">TaskFlow</span>
+                    style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:-0.5px;">MyTugas</span>
             </div>
 
             <h2 class="form-title">Buat akun baru</h2>
