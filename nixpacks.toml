@@ -1,11 +1,5 @@
 [phases.setup]
-nixPkgs = [
-  "php82",
-  "php82Extensions.pdo",
-  "php82Extensions.pdo_mysql",
-  "composer",
-  "nodejs"
-]
+nixPkgs = ["php82", "composer", "nodejs"]
 
 [phases.install]
 cmds = [
@@ -15,4 +9,4 @@ cmds = [
 ]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php -d extension=pdo_mysql artisan serve --host=0.0.0.0 --port=$PORT"
